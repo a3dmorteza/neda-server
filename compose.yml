@@ -17,7 +17,6 @@ services:
       - ./config/sites:/etc/caddy/sites
       - ./ssl:/etc/ssl:ro
       - ./public:/public
-    networks:
-      internal:
-        aliases:
-          - acme.localhost
+    ports:
+      - "80:80"
+      - "443:443"
