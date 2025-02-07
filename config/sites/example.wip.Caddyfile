@@ -1,0 +1,17 @@
+example.wip {
+    tls {
+        issuer internal {
+            ca neda
+        }
+    }
+
+    handle {
+        root * /public/{host}
+        file_server
+    }
+
+    # ارائه پیغام خطای مناسب
+    handle {
+        respond "خطا: یافت نشد!" 404
+    }
+}

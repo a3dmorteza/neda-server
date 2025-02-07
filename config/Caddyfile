@@ -14,35 +14,4 @@
     }
 }
 
-:443 {
-    tls {
-        issuer internal {
-            ca neda
-        }
-    }
-
-    # مرحله 1: بررسی مسیر /public/<domain>/، اما استثنا کردن برخی پسوندها
-    @publicPath {
-        not path_regexp excludedExtensions \.(php|log|bak|tmp|conf|ini)$ # استثنا کردن پسوندهای خاص
-        file {
-            root /public/{host}
-        }
-    }
-    handle @publicPath {
-        root * /public/{host}
-        file_server
-    }
-
-    # مرحله 2: بررسی تنظیمات دامنه در /config/sites/
-    @siteConfig {
-        expression {host} != ""
-    }
-    handle @siteConfig {
-        import /etc/caddy/sites/{host}.caddy
-    }
-
-    # مرحله 3: ارائه پیغام خطای مناسب
-    handle {
-        respond "خطا: دامنه مورد نظر یافت نشد یا تنظیمات آن موجود نیست." 404
-    }
-}
+import /etc/caddy/sites/*.Caddyfile
