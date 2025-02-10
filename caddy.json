@@ -1,0 +1,147 @@
+{
+    "admin": {
+        "listen": ":2019"
+    },
+    "apps": {
+        "http": {
+            "servers": {
+                "localhost443": {
+                    "listen": [
+                        ":443"
+                    ],
+                    "routes": [
+                        {
+                            "handle": [
+                                {
+                                    "handler": "subroute",
+                                    "routes": [
+                                        {
+                                            "group": "group2",
+                                            "handle": [
+                                                {
+                                                    "handler": "subroute",
+                                                    "routes": [
+                                                        {
+                                                            "handle": [
+                                                                {
+                                                                    "handler": "vars",
+                                                                    "root": "/srv/example"
+                                                                },
+                                                                {
+                                                                    "handler": "file_server",
+                                                                    "hide": [
+                                                                        "/etc/caddy/Caddyfile"
+                                                                    ]
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                },
+                                                {
+                                                    "handler": "subroute",
+                                                    "routes": [
+                                                        {
+                                                            "handle": [
+                                                                {
+                                                                    "body": "خطا: یافت نشد!",
+                                                                    "handler": "static_response",
+                                                                    "status_code": 404
+                                                                }
+                                                            ]
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ],
+                            "match": [
+                                {
+                                    "host": [
+                                        "example.wip"
+                                    ]
+                                }
+                            ],
+                            "terminal": true
+                        }
+                    ]
+                },
+                "localhost80": {
+                    "listen": [
+                        ":80"
+                    ],
+                    "routes": [
+                        {
+                            "handle": [
+                                {
+                                    "handler": "vars",
+                                    "root": "/srv/default"
+                                }
+                            ]
+                        },
+                        {
+                            "handle": [
+                                {
+                                    "handler": "rewrite",
+                                    "uri": "{http.matchers.file.relative}"
+                                }
+                            ],
+                            "match": [
+                                {
+                                    "file": {
+                                        "try_files": [
+                                            "{http.request.uri.path}",
+                                            "/public/default/index.html"
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            "handle": [
+                                {
+                                    "handler": "file_server",
+                                    "hide": [
+                                        "/etc/caddy/Caddyfile"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        "pki": {
+            "certificate_authorities": {
+                "local": {
+                    "name": "Neda CA"
+                }
+            }
+        },
+        "tls": {
+            "automation": {
+                "policies": [
+                    {
+                        "issuers": [
+                            {
+                                "module": "internal"
+                            }
+                        ],
+                        "subjects": [
+                            "*.wip",
+                            "*.localhost"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "logging": {
+        "logs": {
+            "default": {
+                "level": "DEBUG"
+            }
+        }
+    }
+}

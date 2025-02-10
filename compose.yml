@@ -1,23 +1,29 @@
 services:
   dns:
-    restart: always
     image: strm/dnsmasq
+    restart: unless-stopped
     volumes:
-      - ./config/dnsmasq.conf:/etc/dnsmasq.conf
+      - ./dnsmasq.conf:/etc/dnsmasq.conf
     ports:
       - "53:53/tcp"
       - "53:53/udp"
     cap_add:
       - NET_ADMIN
   caddy:
-    restart: always
     image: caddy:latest
-    volumes:
-      - ./config/Caddyfile:/etc/caddy/Caddyfile
-      - ./config/sites:/etc/caddy/sites
-      - ./ssl:/etc/ssl:ro
-      - ./public:/public
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
+      - "443:443/udp"
       - "127.0.0.1:2019:2019"
+    volumes:
+      - ./caddy.json:/etc/caddy/caddy.json
+      - ./srv:/srv
+      - caddy_data:/data
+      - caddy_config:/config
+    command: ["caddy", "run", "--config", "/etc/caddy/caddy.json", "--resume"]
+
+volumes:
+  caddy_data:
+  caddy_config:
